@@ -69,6 +69,12 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    workflows: Workflow;
+    nodes: Node;
+    edges: Edge;
+    credentials: Credential;
+    executions: Execution;
+    triggers: Trigger;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -77,12 +83,18 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    workflows: WorkflowsSelect<false> | WorkflowsSelect<true>;
+    nodes: NodesSelect<false> | NodesSelect<true>;
+    edges: EdgesSelect<false> | EdgesSelect<true>;
+    credentials: CredentialsSelect<false> | CredentialsSelect<true>;
+    executions: ExecutionsSelect<false> | ExecutionsSelect<true>;
+    triggers: TriggersSelect<false> | TriggersSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
   globals: {};
   globalsSelect: {};
@@ -118,7 +130,7 @@ export interface UserAuthOperations {
  * via the `definition` "users".
  */
 export interface User {
-  id: string;
+  id: number;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -142,7 +154,7 @@ export interface User {
  * via the `definition` "media".
  */
 export interface Media {
-  id: string;
+  id: number;
   alt: string;
   updatedAt: string;
   createdAt: string;
@@ -158,23 +170,195 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "workflows".
+ */
+export interface Workflow {
+  id: number;
+  name: string;
+  description?: string | null;
+  owner: number | User;
+  isActive?: boolean | null;
+  triggerNode?: (number | null) | Node;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "nodes".
+ */
+export interface Node {
+  id: number;
+  workflow: number | Workflow;
+  name: string;
+  type: 'trigger' | 'action' | 'function' | 'http' | 'email';
+  position?: {
+    x?: number | null;
+    y?: number | null;
+  };
+  config?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  credentials?: (number | null) | Credential;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "credentials".
+ */
+export interface Credential {
+  id: number;
+  owner: number | User;
+  name: string;
+  type: 'http' | 'slack' | 'gmail' | 'custom';
+  /**
+   * Encrypted credentials JSON
+   */
+  data:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "edges".
+ */
+export interface Edge {
+  id: number;
+  workflow: number | Workflow;
+  sourceNode: number | Node;
+  targetNode: number | Node;
+  condition?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "executions".
+ */
+export interface Execution {
+  id: number;
+  workflow: number | Workflow;
+  status?: ('running' | 'success' | 'failed') | null;
+  startedAt?: string | null;
+  finishedAt?: string | null;
+  inputData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  outputData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  log?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  errorMessage?: string | null;
+  triggeredBy?: ('manual' | 'schedule' | 'webhook') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "triggers".
+ */
+export interface Trigger {
+  id: number;
+  workflow: number | Workflow;
+  type?: ('webhook' | 'schedule' | 'event') | null;
+  config?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  isEnabled?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
       } | null)
     | ({
         relationTo: 'media';
-        value: string | Media;
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'workflows';
+        value: number | Workflow;
+      } | null)
+    | ({
+        relationTo: 'nodes';
+        value: number | Node;
+      } | null)
+    | ({
+        relationTo: 'edges';
+        value: number | Edge;
+      } | null)
+    | ({
+        relationTo: 'credentials';
+        value: number | Credential;
+      } | null)
+    | ({
+        relationTo: 'executions';
+        value: number | Execution;
+      } | null)
+    | ({
+        relationTo: 'triggers';
+        value: number | Trigger;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -184,10 +368,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -207,7 +391,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -252,6 +436,91 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "workflows_select".
+ */
+export interface WorkflowsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  owner?: T;
+  isActive?: T;
+  triggerNode?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "nodes_select".
+ */
+export interface NodesSelect<T extends boolean = true> {
+  workflow?: T;
+  name?: T;
+  type?: T;
+  position?:
+    | T
+    | {
+        x?: T;
+        y?: T;
+      };
+  config?: T;
+  credentials?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "edges_select".
+ */
+export interface EdgesSelect<T extends boolean = true> {
+  workflow?: T;
+  sourceNode?: T;
+  targetNode?: T;
+  condition?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "credentials_select".
+ */
+export interface CredentialsSelect<T extends boolean = true> {
+  owner?: T;
+  name?: T;
+  type?: T;
+  data?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "executions_select".
+ */
+export interface ExecutionsSelect<T extends boolean = true> {
+  workflow?: T;
+  status?: T;
+  startedAt?: T;
+  finishedAt?: T;
+  inputData?: T;
+  outputData?: T;
+  log?: T;
+  errorMessage?: T;
+  triggeredBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "triggers_select".
+ */
+export interface TriggersSelect<T extends boolean = true> {
+  workflow?: T;
+  type?: T;
+  config?: T;
+  isEnabled?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
