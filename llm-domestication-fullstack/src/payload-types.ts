@@ -75,6 +75,7 @@ export interface Config {
     credentials: Credential;
     executions: Execution;
     triggers: Trigger;
+    'node-types': NodeType;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -89,6 +90,7 @@ export interface Config {
     credentials: CredentialsSelect<false> | CredentialsSelect<true>;
     executions: ExecutionsSelect<false> | ExecutionsSelect<true>;
     triggers: TriggersSelect<false> | TriggersSelect<true>;
+    'node-types': NodeTypesSelect<false> | NodeTypesSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -318,6 +320,18 @@ export interface Trigger {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "node-types".
+ */
+export interface NodeType {
+  id: number;
+  name: string;
+  description?: string | null;
+  icon?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -354,6 +368,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'triggers';
         value: number | Trigger;
+      } | null)
+    | ({
+        relationTo: 'node-types';
+        value: number | NodeType;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -519,6 +537,17 @@ export interface TriggersSelect<T extends boolean = true> {
   type?: T;
   config?: T;
   isEnabled?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "node-types_select".
+ */
+export interface NodeTypesSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  icon?: T;
   updatedAt?: T;
   createdAt?: T;
 }

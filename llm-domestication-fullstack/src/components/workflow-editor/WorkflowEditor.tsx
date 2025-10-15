@@ -16,10 +16,15 @@ import ReactFlow, {
   applyNodeChanges,
 } from 'react-flow-renderer'
 import axios from 'axios'
-import Button from './ui/button'
+import Button from '../ui/button'
+import CustomNode from './Node'
 
 const initialNodes: Node[] = []
 const initialEdges: Edge[] = []
+
+const nodeTypes = {
+  custom: CustomNode,
+}
 
 export default function WorkflowEditor({ workflowId }: { workflowId: string }) {
   const [nodes, setNodes] = useState<Node[]>(initialNodes)
@@ -30,9 +35,13 @@ export default function WorkflowEditor({ workflowId }: { workflowId: string }) {
     const id = `node_${nodes.length + 1}`
     const newNode: Node = {
       id,
-      type: 'default',
+      type: 'custom', // 👈 Use the custom node type
       position: { x: Math.random() * 400, y: Math.random() * 400 },
-      data: { label: `Node ${nodes.length + 1}` },
+      data: {
+        label: `Custom Node ${nodes.length + 1}`,
+        description: 'This is a custom node',
+        onClick: () => alert(`Clicked node ${id}`),
+      },
     }
     setNodes((nds) => [...nds, newNode])
   }, [nodes])
@@ -66,19 +75,21 @@ export default function WorkflowEditor({ workflowId }: { workflowId: string }) {
   }
 
   return (
-    <div className="flex flex-col flex-1 h-full">
+    <div className="flex flex-col flex-1 h-full gap-2 p-5">
       <div className="flex gap-2 py-2">
-        <Button onClick={addNode}>Add Node</Button>
+        <Button onClick={addNode}>Add Custom Node</Button>
         <Button onClick={saveWorkflow}>Save Workflow</Button>
       </div>
       <ReactFlowProvider>
         <ReactFlow
           nodes={nodes}
           edges={edges}
+          nodeTypes={nodeTypes}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           fitView
+          className="border py-2"
         >
           <MiniMap />
           <Controls />

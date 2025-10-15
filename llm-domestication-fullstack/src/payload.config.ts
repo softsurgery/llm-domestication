@@ -15,6 +15,7 @@ import { Edges } from './collections/Edges'
 import { Credentials } from './collections/Credentials'
 import { Executions } from './collections/Executions'
 import { Triggers } from './collections/Triggers'
+import { NodeTypes } from './collections/NodeTypes'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -26,7 +27,17 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Workflows, Nodes, Edges, Credentials, Executions, Triggers],
+  collections: [
+    Users,
+    Media,
+    Workflows,
+    Nodes,
+    Edges,
+    Credentials,
+    Executions,
+    Triggers,
+    NodeTypes,
+  ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
