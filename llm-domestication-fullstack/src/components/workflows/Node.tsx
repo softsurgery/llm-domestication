@@ -7,8 +7,9 @@ import { useNodeTypes } from '@/hooks/useNodeTypes'
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../ui/dialog'
 import { Card, CardContent, CardCover, CardFooter, CardHeader, CardTitle } from '../ui/card'
 import { Media } from '@/payload-types'
+import { observer } from 'mobx-react-lite'
 
-export default function CustomNode({ data }: any) {
+export const CustomNode = observer(({ id, data }) => {
   const handleButtonClick = (event: React.MouseEvent) => {
     event.stopPropagation()
     data.onClick?.()
@@ -17,7 +18,7 @@ export default function CustomNode({ data }: any) {
   return (
     <div className="bg-background border rounded-xl shadow p-3 w-48 text-center cursor-move">
       <div className="font-semibold mb-1">{data.label || 'Custom Node'}</div>
-      {data.description && <div className="text-xs text-gray-500 mb-2">{data.description}</div>}
+      {data.description && <div className="text-xs mb-2">{data.description}</div>}
       <Dialog>
         <DialogTrigger>
           <Button>Select Node Type</Button>
@@ -61,6 +62,10 @@ export default function CustomNode({ data }: any) {
       {/* Handles for connecting nodes */}
       <Handle type="target" position={Position.Top} />
       <Handle type="source" position={Position.Bottom} />
+      <Handle type="source" position={Position.Right} />
+      <Handle type="target" position={Position.Left} />
     </div>
   )
-}
+})
+
+export default CustomNode

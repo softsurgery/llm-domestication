@@ -1,58 +1,80 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useCallback } from 'react'
 import ReactFlow, {
   ReactFlowProvider,
-  addEdge,
   MiniMap,
   Controls,
   Background,
-  Node,
-  Edge,
   Connection,
   NodeChange,
   EdgeChange,
-  applyEdgeChanges,
-  applyNodeChanges,
 } from 'react-flow-renderer'
 import axios from 'axios'
+import { observer } from 'mobx-react-lite'
+import workflowModel from '@/models/workflow.model'
 import Button from '../ui/button'
 import CustomNode from './Node'
-
-const initialNodes: Node[] = []
-const initialEdges: Edge[] = []
+import { useBreadcrumb } from '@/contexts/BreadcrumbContext'
+import { useIntro } from '@/contexts/IntroContext'
+import Input from '../ui/input'
+import Textarea from '../ui/textarea'
+import { Node as DomainNode, Edge as DomainEdge } from '@/payload-types'
 
 const nodeTypes = {
   custom: CustomNode,
 }
 
-export default function WorkflowEditor({ workflowId }: { workflowId: string }) {
-  const [nodes, setNodes] = useState<Node[]>(initialNodes)
-  const [edges, setEdges] = useState<Edge[]>(initialEdges)
-
-  // Add node dynamically
-  const addNode = useCallback(() => {
-    const id = `node_${nodes.length + 1}`
-    const newNode: Node = {
-      id,
-      type: 'custom',
-      position: { x: Math.random() * 400, y: Math.random() * 400 },
-      data: {
-        label: `Custom Node ${nodes.length + 1}`,
-        description: 'This is a custom node',
-        onClick: () => alert(`Clicked node ${id}`),
-      },
+const WorkflowEditor = observer(({ workflowId }: { workflowId: string }) => {
+  const { setIntro, clearIntro } = useIntro()
+  const { setRoutes, clearRoutes } = useBreadcrumb()
+  React.useEffect(() => {
+    setIntro?.(
+      'New Workflow',
+      'Define a new workflow by adding nodes and edges, define relationships between nodes',
+    )
+    setRoutes?.([
+      { title: 'Home', href: '/' },
+      { title: 'Workflows', href: '/workflows' },
+      { title: 'Executions', href: '/executions' },
+    ])
+    return () => {
+      clearIntro?.()
+      clearRoutes?.()
     }
-    setNodes((nds) => [...nds, newNode])
-  }, [nodes])
+  }, [])
+  const { nodes, edges, setNodes, setEdges } = workflowModel
 
-  // Handle edge creation
+  const addNode = useCallback(() => {
+    const id = Date.now() // temporary
+    const newNode: DomainNode = {
+      id,
+      name: `Node ${id}`,
+      type: 'action',
+      workflow: Number(workflowId),
+      position: { x: Math.random() * 400, y: Math.random() * 400 },
+      updatedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+    }
+    workflowModel.setNodes([...workflowModel.nodes, newNode])
+  }, [workflowId])
+
   const onConnect = useCallback(
-    (params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)),
-    [],
+    (params: Connection) => {
+      const newEdge: DomainEdge = {
+        id: Date.now(),
+        workflow: Number(workflowId),
+        sourceNode: Number(params.source),
+        targetNode: Number(params.target),
+        condition: {},
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+      workflowModel.setEdges([...workflowModel.edges, newEdge])
+    },
+    [workflowId],
   )
 
-  // Save workflow nodes and edges to Payload
   const saveWorkflow = useCallback(async () => {
     try {
       await axios.put(`/api/workflows/${workflowId}`, {
@@ -66,36 +88,82 @@ export default function WorkflowEditor({ workflowId }: { workflowId: string }) {
     }
   }, [nodes, edges, workflowId])
 
-  const onNodesChange = (changes: NodeChange[]) => {
-    setNodes((nds) => applyNodeChanges(changes, nds))
-  }
+  const onNodesChange = useCallback((changes: NodeChange[]) => {
+    changes.forEach((change) => {
+      if (change.type === 'position' && change.position) {
+        workflowModel.updateNodePosition(change.id, change.position.x, change.position.y)
+      }
+    })
+  }, [])
 
-  const onEdgesChange = (changes: EdgeChange[]) => {
-    setEdges((eds) => applyEdgeChanges(changes, eds))
-  }
+  const onEdgesChange = useCallback((changes: EdgeChange[]) => {
+    changes.forEach((change) => {
+      switch (change.type) {
+        case 'remove':
+          workflowModel.deleteEdge(change.id)
+          break
+
+        case 'select':
+          // Optional — handle UI edge selection if you need it
+          break
+
+        case 'replace':
+          if ('edge' in change) {
+            const newEdge = change.edge
+            workflowModel.updateEdge(change.id, {
+              sourceNode: Number(newEdge.source),
+              targetNode: Number(newEdge.target),
+            })
+          }
+          break
+      }
+    })
+  }, [])
 
   return (
-    <div className="flex flex-col flex-1 h-full gap-2 p-5">
-      <div className="flex gap-2 py-2">
-        <Button onClick={addNode}>Add Custom Node</Button>
-        <Button onClick={saveWorkflow}>Save Workflow</Button>
+    <div className="flex flex-row flex-1 h-full gap-2 py-5">
+      <div className="flex flex-col flex-[3]">
+        <div className="flex gap-2 py-2">
+          <Button onClick={addNode}>Add Custom Node</Button>
+          <Button onClick={saveWorkflow}>Save Workflow</Button>
+        </div>
+
+        <ReactFlowProvider>
+          <ReactFlow
+            nodes={workflowModel.xNodes}
+            edges={workflowModel.xEdges}
+            nodeTypes={nodeTypes}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            onPaneClick={() => workflowModel.setSelectedNode(null)}
+            onNodeDragStart={(event, node) => {
+              workflowModel.setSelectedNode(node)
+            }}
+            fitView
+            className="border py-2 rounded-lg"
+          >
+            <MiniMap />
+            <Controls />
+            <Background color="#aaa" gap={16} />
+          </ReactFlow>
+        </ReactFlowProvider>
       </div>
-      <ReactFlowProvider>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          nodeTypes={nodeTypes}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          fitView
-          className="border py-2"
-        >
-          <MiniMap />
-          <Controls />
-          <Background color="#aaa" gap={16} />
-        </ReactFlow>
-      </ReactFlowProvider>
+      <div className="flex-1 rounded-lg border p-5">
+        {workflowModel.selectedNode ? (
+          <div>
+            <h2 className="font-semibold text-lg mb-2">{workflowModel.selectedNode.id}</h2>
+            <p>{workflowModel?.selectedNode?.position?.x}</p>
+            <p>{workflowModel?.selectedNode?.position?.y}</p>
+            <Input placeholder="Hello" />
+            <Textarea className="resize-none" rows={10} />
+          </div>
+        ) : (
+          <p className="text-gray-500 italic">No node selected</p>
+        )}
+      </div>
     </div>
   )
-}
+})
+
+export default WorkflowEditor
