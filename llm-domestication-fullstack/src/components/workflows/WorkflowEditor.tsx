@@ -35,7 +35,7 @@ export default function WorkflowEditor({ workflowId }: { workflowId: string }) {
     const id = `node_${nodes.length + 1}`
     const newNode: Node = {
       id,
-      type: 'custom', // 👈 Use the custom node type
+      type: 'custom',
       position: { x: Math.random() * 400, y: Math.random() * 400 },
       data: {
         label: `Custom Node ${nodes.length + 1}`,

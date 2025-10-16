@@ -11,7 +11,10 @@ interface HeaderProps {
 export const Header = observer(({ className }: HeaderProps) => {
   return (
     <header
-      className={cn('flex items-center justify-between p-4 border-b bg-background', className)}
+      className={cn(
+        'flex items-center justify-between p-4 border-t border-b bg-background',
+        className,
+      )}
     >
       <ModeToggle />
     </header>

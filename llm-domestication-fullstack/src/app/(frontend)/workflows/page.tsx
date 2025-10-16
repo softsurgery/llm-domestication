@@ -1,3 +1,5 @@
+import { WorkflowPortal } from '@/components/workflows/WorkflowPortal'
+
 export default function Screen() {
-  return <div>Workflows</div>
+  return <WorkflowPortal />
 }

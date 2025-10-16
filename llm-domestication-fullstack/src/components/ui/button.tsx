@@ -16,15 +16,11 @@ export default function Button({
     'inline-flex items-center justify-center font-medium rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none'
 
   const variants: Record<NonNullable<ButtonProps['variant']>, string> = {
-    primary:
-      'bg-[var(--color-primary)] text-[var(--color-primary-foreground)] hover:bg-[oklch(from_var(--color-primary)_l_c_h_/_0.9)]',
-    secondary:
-      'bg-[var(--color-secondary)] text-[var(--color-secondary-foreground)] hover:bg-[oklch(from_var(--color-secondary)_l_c_h_/_0.9)]',
-    destructive:
-      'bg-[var(--color-destructive)] text-[var(--color-destructive-foreground)] hover:bg-[oklch(from_var(--color-destructive)_l_c_h_/_0.9)]',
-    outline:
-      'border border-[var(--color-border)] text-[var(--color-foreground)] bg-transparent hover:bg-[var(--color-muted)]',
-    ghost: 'text-[var(--color-foreground)] bg-transparent hover:bg-[var(--color-muted)]',
+    primary: 'bg-primary text-foreground hover:bg-primary/75',
+    secondary: 'bg-secondary text-foreground hover:bg-secondary/75',
+    destructive: 'bg-destructive text-foreground hover:bg-destructive/75',
+    outline: 'border text-forground bg-transparent hover:bg-muted',
+    ghost: 'text-foreground bg-transparent hover:bg-muted',
   }
 
   const sizes: Record<NonNullable<ButtonProps['size']>, string> = {

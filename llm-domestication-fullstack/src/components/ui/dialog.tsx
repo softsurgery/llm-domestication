@@ -76,7 +76,7 @@ export function DialogContent({ className, children }: DialogContentProps) {
         {/* Dialog Container */}
         <div
           className={cn(
-            'relative bg-background rounded-lg shadow-lg pb-6 px-6 min-w-[30vw] max-w-[70vw] max-h-[80vh] overflow-y-auto border',
+            'relative bg-background rounded-lg shadow-lg pb-6 px-6 min-w-[30vw] max-w-[70vw] max-h-[80vh] overflow-auto border',
             className,
           )}
           onClick={(e) => e.stopPropagation()}

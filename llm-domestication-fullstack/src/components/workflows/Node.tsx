@@ -4,14 +4,7 @@ import React from 'react'
 import { Handle, Position } from 'react-flow-renderer'
 import Button from '../ui/button'
 import { useNodeTypes } from '@/hooks/useNodeTypes'
-import {
-  Dialog,
-  DialogCloseButton,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTrigger,
-} from '../ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../ui/dialog'
 import { Card, CardContent, CardCover, CardFooter, CardHeader, CardTitle } from '../ui/card'
 import { Media } from '@/payload-types'
 
