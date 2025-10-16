@@ -1,7 +1,0 @@
-@import 'tailwindcss';
-
-@layer base {
-  * {
-    @apply border-gray-200 text-gray-700 bg-transparent;
-  }
-}
