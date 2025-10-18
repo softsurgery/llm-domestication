@@ -31,7 +31,10 @@ export default function Button({
   }
 
   return (
-    <button className={cn(baseStyles, variants[variant], sizes[size], className)} {...props}>
+    <button
+      className={cn(baseStyles, variants[variant], sizes[size], 'truncate', className)}
+      {...props}
+    >
       {children}
     </button>
   )
