@@ -1,11 +1,35 @@
+import { PayloadHiddenComponent } from '@/components/HiddenComponent'
 import { CollectionConfig } from 'payload'
+import { v4 as uuidv4 } from 'uuid'
 
 export const Nodes: CollectionConfig = {
   slug: 'nodes',
   admin: {
     useAsTitle: 'name',
   },
+  hooks: {
+    beforeValidate: [
+      ({ data }) => {
+        if (!data?.id) {
+          // generate a UUID
+          const customID = uuidv4()
+          return { ...data, id: customID }
+        }
+        return data
+      },
+    ],
+  },
+
   fields: [
+    {
+      name: 'id',
+      type: 'text',
+      admin: {
+        components: {
+          Field: PayloadHiddenComponent,
+        },
+      },
+    },
     {
       name: 'workflow',
       type: 'relationship',
@@ -18,16 +42,15 @@ export const Nodes: CollectionConfig = {
       required: true,
     },
     {
+      name: 'description',
+      type: 'textarea',
+      required: false,
+    },
+    {
       name: 'type',
-      type: 'select',
-      required: true,
-      options: [
-        { label: 'Trigger', value: 'trigger' },
-        { label: 'Action', value: 'action' },
-        { label: 'Function', value: 'function' },
-        { label: 'HTTP Request', value: 'http' },
-        { label: 'Email', value: 'email' },
-      ],
+      type: 'relationship',
+      required: false,
+      relationTo: 'node-types',
     },
     {
       name: 'position',

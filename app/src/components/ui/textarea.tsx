@@ -10,7 +10,7 @@ const Textarea: React.FC<InputProps> = ({ id, className, ...props }) => {
     <textarea
       id={id}
       className={cn(
-        `block mt-2 w-full rounded-lg border px-5 py-2.5 focus:border-primary focus:outline-none focus:ring focus:ring-primary`,
+        `block mt-1 w-full rounded-lg border px-4 py-2 focus:border-primary focus:outline-none focus:ring focus:ring-primary`,
         className,
       )}
       {...props}

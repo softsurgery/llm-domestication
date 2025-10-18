@@ -10,7 +10,7 @@ const Input: React.FC<InputProps> = ({ id, className, ...props }) => {
     <input
       id={id}
       className={cn(
-        `block mt-2 w-full rounded-lg border px-5 py-2.5 focus:border-primary focus:outline-none focus:ring focus:ring-primary`,
+        `block w-full rounded-lg border px-4 py-2 focus:border-primary focus:outline-none focus:ring focus:ring-primary`,
         className,
       )}
       {...props}

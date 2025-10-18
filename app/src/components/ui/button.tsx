@@ -1,7 +1,7 @@
 import { cn } from '@/lib/cn'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'destructive' | 'outline' | 'ghost'
+  variant?: 'primary' | 'secondary' | 'destructive' | 'outline' | 'ghost' | 'link'
   size?: 'default' | 'sm' | 'lg'
 }
 
@@ -21,6 +21,7 @@ export default function Button({
     destructive: 'bg-destructive text-foreground hover:bg-destructive/75',
     outline: 'border text-forground bg-transparent hover:bg-muted',
     ghost: 'text-foreground bg-transparent hover:bg-muted',
+    link: 'text-foreground underline hover:text-foreground/75',
   }
 
   const sizes: Record<NonNullable<ButtonProps['size']>, string> = {

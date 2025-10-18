@@ -180,7 +180,7 @@ export interface Workflow {
   description?: string | null;
   owner: number | User;
   isActive?: boolean | null;
-  triggerNode?: (number | null) | Node;
+  triggerNode?: (string | null) | Node;
   updatedAt: string;
   createdAt: string;
 }
@@ -189,10 +189,11 @@ export interface Workflow {
  * via the `definition` "nodes".
  */
 export interface Node {
-  id: number;
+  id: string;
   workflow: number | Workflow;
   name: string;
-  type: 'trigger' | 'action' | 'function' | 'http' | 'email';
+  description?: string | null;
+  type?: (number | null) | NodeType;
   position?: {
     x?: number | null;
     y?: number | null;
@@ -207,6 +208,18 @@ export interface Node {
     | boolean
     | null;
   credentials?: (number | null) | Credential;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "node-types".
+ */
+export interface NodeType {
+  id: number;
+  name: string;
+  description?: string | null;
+  icon?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
 }
@@ -241,8 +254,8 @@ export interface Credential {
 export interface Edge {
   id: number;
   workflow: number | Workflow;
-  sourceNode: number | Node;
-  targetNode: number | Node;
+  sourceNode: string | Node;
+  targetNode: string | Node;
   condition?:
     | {
         [k: string]: unknown;
@@ -320,18 +333,6 @@ export interface Trigger {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "node-types".
- */
-export interface NodeType {
-  id: number;
-  name: string;
-  description?: string | null;
-  icon?: (number | null) | Media;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -351,7 +352,7 @@ export interface PayloadLockedDocument {
       } | null)
     | ({
         relationTo: 'nodes';
-        value: number | Node;
+        value: string | Node;
       } | null)
     | ({
         relationTo: 'edges';
@@ -473,8 +474,10 @@ export interface WorkflowsSelect<T extends boolean = true> {
  * via the `definition` "nodes_select".
  */
 export interface NodesSelect<T extends boolean = true> {
+  id?: T;
   workflow?: T;
   name?: T;
+  description?: T;
   type?: T;
   position?:
     | T

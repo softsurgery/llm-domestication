@@ -9,6 +9,7 @@ class WorkflowModel {
   nodes: DomainNode[] = []
   edges: DomainEdge[] = []
   selectedNode: DomainNode | null = null
+  selectedEdge: DomainEdge | null = null
 
   constructor() {
     makeObservable(this, {
@@ -16,24 +17,32 @@ class WorkflowModel {
       nodes: observable,
       edges: observable,
       selectedNode: observable,
+      selectedEdge: observable,
       //computed
       xNodes: computed,
       xEdges: computed,
       //action
       addNode: action,
       addEdge: action,
+
       updateNode: action,
+      updateEdge: action,
+
       deleteNode: action,
+      deleteEdge: action,
+
       setNodes: action,
       setEdges: action,
-      updateEdge: action,
-      deleteEdge: action,
+
       setSelectedNode: action,
+      setSelectedEdge: action,
+
+      setNodeAttribute: action,
     })
 
     makePersistable(this, {
       name: 'WorkflowStore',
-      properties: ['nodes', 'xNodes', 'edges', 'xEdges'],
+      properties: ['nodes', 'edges'],
       storage: typeof window !== 'undefined' ? localStorage : undefined,
     })
   }
@@ -99,6 +108,19 @@ class WorkflowModel {
   setSelectedNode = action((node: DomainNode | null) => {
     this.selectedNode = node
   })
+
+  setSelectedEdge = action((edge: DomainEdge | null) => {
+    this.selectedEdge = edge
+  })
+
+  setNodeAttribute<Key extends keyof DomainNode>(attribute: Key, value: DomainNode[Key]) {
+    if (!this.selectedNode) return
+    const node = this.nodes.find((n) => n.id === this.selectedNode!.id)
+    if (node) {
+      node[attribute] = value
+      this.selectedNode = { ...node }
+    }
+  }
 
   updateNodePosition(id: string, x: number, y: number) {
     const n = this.nodes.find((n) => String(n.id) === id)
