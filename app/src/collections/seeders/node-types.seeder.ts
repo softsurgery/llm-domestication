@@ -1,7 +1,7 @@
 import payloadConfig from '@/payload.config'
 import { getPayload } from 'payload'
 
-export async function seedProducts() {
+export async function seedNodeTypes() {
   const payload = await getPayload({ config: payloadConfig })
 
   console.log('🌱 Starting Node Types seed...')
